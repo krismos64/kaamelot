@@ -20,8 +20,8 @@ const kingdom = {
 };
 
 // Constantes pour le labyrinthe
-const MAZE_SIZE = 10;
-const CELL_SIZE = 40;
+const MAZE_SIZE = 15;
+const CELL_SIZE = 30;
 
 // Variables globales
 let maze = [];
@@ -33,14 +33,14 @@ function drawKingdom() {
   const canvas = document.getElementById("kingdomCanvas");
   const ctx = canvas.getContext("2d");
 
-  canvas.width = 800;
-  canvas.height = 600;
+  canvas.width = 600;
+  canvas.height = 400;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Dessiner les nœuds
   kingdom.nodes.forEach((node, index) => {
-    const x = 100 + (index % 3) * 300;
+    const x = 100 + (index % 3) * 200;
     const y = 100 + Math.floor(index / 3) * 200;
     ctx.beginPath();
     ctx.arc(x, y, 30, 0, 2 * Math.PI);
@@ -48,7 +48,7 @@ function drawKingdom() {
     ctx.fill();
     ctx.stroke();
     ctx.fillStyle = "black";
-    ctx.font = "14px Arial";
+    ctx.font = "14px Merriweather";
     ctx.textAlign = "center";
     ctx.fillText(node, x, y + 45);
   });
@@ -57,9 +57,9 @@ function drawKingdom() {
   kingdom.edges.forEach((edge) => {
     const fromIndex = kingdom.nodes.indexOf(edge.from);
     const toIndex = kingdom.nodes.indexOf(edge.to);
-    const fromX = 100 + (fromIndex % 3) * 300;
+    const fromX = 100 + (fromIndex % 3) * 200;
     const fromY = 100 + Math.floor(fromIndex / 3) * 200;
-    const toX = 100 + (toIndex % 3) * 300;
+    const toX = 100 + (toIndex % 3) * 200;
     const toY = 100 + Math.floor(toIndex / 3) * 200;
 
     ctx.beginPath();
@@ -67,7 +67,7 @@ function drawKingdom() {
     ctx.lineTo(toX, toY);
     ctx.stroke();
     ctx.fillStyle = "black";
-    ctx.font = "12px Arial";
+    ctx.font = "12px Merriweather";
     ctx.fillText(edge.weight.toString(), (fromX + toX) / 2, (fromY + toY) / 2);
   });
 }
@@ -114,7 +114,7 @@ function dijkstra(start, end) {
   return path;
 }
 
-// Dessiner le chemin le plus court sur la carte
+// Fonction pour dessiner le chemin le plus court
 function drawShortestPath(path) {
   const canvas = document.getElementById("kingdomCanvas");
   const ctx = canvas.getContext("2d");
@@ -122,9 +122,9 @@ function drawShortestPath(path) {
   for (let i = 0; i < path.length - 1; i++) {
     const fromIndex = kingdom.nodes.indexOf(path[i]);
     const toIndex = kingdom.nodes.indexOf(path[i + 1]);
-    const fromX = 100 + (fromIndex % 3) * 300;
+    const fromX = 100 + (fromIndex % 3) * 200;
     const fromY = 100 + Math.floor(fromIndex / 3) * 200;
-    const toX = 100 + (toIndex % 3) * 300;
+    const toX = 100 + (toIndex % 3) * 200;
     const toY = 100 + Math.floor(toIndex / 3) * 200;
 
     ctx.beginPath();
@@ -138,17 +138,36 @@ function drawShortestPath(path) {
   ctx.lineWidth = 1;
 }
 
-// Fonction pour générer un labyrinthe simple
+// Fonction pour générer un labyrinthe simple avec un chemin garanti
 function generateMaze() {
   for (let y = 0; y < MAZE_SIZE; y++) {
     maze[y] = [];
     for (let x = 0; x < MAZE_SIZE; x++) {
-      maze[y][x] = Math.random() < 0.3 ? 1 : 0;
+      maze[y][x] = 1;
     }
   }
-  // Assurer que le début et la fin sont accessibles
-  maze[startPosition.y][startPosition.x] = 0;
+
+  let currentPos = { ...startPosition };
+  while (
+    currentPos.x !== treasurePosition.x ||
+    currentPos.y !== treasurePosition.y
+  ) {
+    maze[currentPos.y][currentPos.x] = 0;
+    if (Math.random() < 0.5 && currentPos.x !== treasurePosition.x) {
+      currentPos.x += currentPos.x < treasurePosition.x ? 1 : -1;
+    } else if (currentPos.y !== treasurePosition.y) {
+      currentPos.y += currentPos.y < treasurePosition.y ? 1 : -1;
+    }
+  }
   maze[treasurePosition.y][treasurePosition.x] = 0;
+
+  for (let y = 0; y < MAZE_SIZE; y++) {
+    for (let x = 0; x < MAZE_SIZE; x++) {
+      if (maze[y][x] === 1 && Math.random() < 0.3) {
+        maze[y][x] = 0;
+      }
+    }
+  }
 }
 
 // Fonction pour dessiner le labyrinthe
@@ -252,101 +271,19 @@ function drawMazePathSegment(path, index) {
     ctx.lineTo((next.x + 0.5) * CELL_SIZE, (next.y + 0.5) * CELL_SIZE);
     ctx.stroke();
 
-    setTimeout(() => drawMazePathSegment(path, index + 1), 200);
+    setTimeout(() => drawMazePathSegment(path, index + 1), 100);
   }
 }
 
-// Fonction pour générer un labyrinthe simple avec un chemin garanti
-function generateMaze() {
-  // Initialiser le labyrinthe avec des murs
-  for (let y = 0; y < MAZE_SIZE; y++) {
-    maze[y] = [];
-    for (let x = 0; x < MAZE_SIZE; x++) {
-      maze[y][x] = 1;
-    }
-  }
-
-  // Créer un chemin de l'entrée au trésor
-  let currentPos = { ...startPosition };
-  while (
-    currentPos.x !== treasurePosition.x ||
-    currentPos.y !== treasurePosition.y
-  ) {
-    maze[currentPos.y][currentPos.x] = 0;
-    if (Math.random() < 0.5 && currentPos.x !== treasurePosition.x) {
-      currentPos.x += currentPos.x < treasurePosition.x ? 1 : -1;
-    } else if (currentPos.y !== treasurePosition.y) {
-      currentPos.y += currentPos.y < treasurePosition.y ? 1 : -1;
-    }
-  }
-  maze[treasurePosition.y][treasurePosition.x] = 0;
-
-  // Ajouter des passages supplémentaires
-  for (let y = 0; y < MAZE_SIZE; y++) {
-    for (let x = 0; x < MAZE_SIZE; x++) {
-      if (maze[y][x] === 1 && Math.random() < 0.7) {
-        maze[y][x] = 0;
-      }
-    }
-  }
+function showHelpMessage(message) {
+  const helpDiv = document.createElement("div");
+  helpDiv.className = "help-message";
+  helpDiv.textContent = message;
+  document.body.appendChild(helpDiv);
+  setTimeout(() => {
+    helpDiv.remove();
+  }, 3000);
 }
-
-// Fonction pour trouver le chemin dans le labyrinthe
-function findMazePath() {
-  const queue = [[startPosition]];
-  const visited = new Set();
-
-  while (queue.length > 0) {
-    const path = queue.shift();
-    const { x, y } = path[path.length - 1];
-
-    if (x === treasurePosition.x && y === treasurePosition.y) {
-      return path;
-    }
-
-    const directions = [
-      [0, 1],
-      [1, 0],
-      [0, -1],
-      [-1, 0],
-    ];
-    for (let [dx, dy] of directions) {
-      const newX = x + dx;
-      const newY = y + dy;
-      const key = `${newX},${newY}`;
-
-      if (
-        newX >= 0 &&
-        newX < MAZE_SIZE &&
-        newY >= 0 &&
-        newY < MAZE_SIZE &&
-        maze[newY][newX] === 0 &&
-        !visited.has(key)
-      ) {
-        queue.push([...path, { x: newX, y: newY }]);
-        visited.add(key);
-      }
-    }
-  }
-
-  return null; // Pas de chemin trouvé
-}
-
-window.onload = () => {
-  // Gestionnaire pour le bouton "Trouver le trésor" du labyrinthe
-  document.getElementById("find-treasure").addEventListener("click", () => {
-    const path = findMazePath();
-    if (path) {
-      drawMaze(); // Redessiner le labyrinthe pour effacer l'ancien chemin
-      drawMazePathSegment(path, 0);
-    } else {
-      alert(
-        "Erreur inattendue : Impossible de trouver un chemin vers le trésor !"
-      );
-      console.error("Erreur inattendue dans la recherche de chemin");
-    }
-  });
-};
 
 // Initialisation
 window.onload = () => {
@@ -366,9 +303,18 @@ window.onload = () => {
   document.getElementById("find-path").addEventListener("click", () => {
     const start = document.getElementById("start-point").value;
     const end = document.getElementById("end-point").value;
+    if (start === end) {
+      showHelpMessage(
+        "Veuillez choisir des points de départ et d'arrivée différents."
+      );
+      return;
+    }
     const path = dijkstra(start, end);
     drawKingdom();
     drawShortestPath(path);
+    showHelpMessage(
+      "Voici le chemin le plus court vers l'entrée du labyrinthe !"
+    );
   });
 
   // Gestionnaire pour le bouton "Trouver le trésor" du labyrinthe
@@ -377,6 +323,7 @@ window.onload = () => {
     if (path) {
       drawMaze(); // Redessiner le labyrinthe pour effacer l'ancien chemin
       drawMazePathSegment(path, 0);
+      showHelpMessage("Le trésor a été trouvé ! Suivez le chemin rouge.");
     } else {
       alert("Impossible de trouver un chemin vers le trésor !");
     }

@@ -6,7 +6,7 @@
     <title>La Quête du Trésor de Kaamelot</title>
     <link rel="stylesheet" href="style.css" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Merriweather&display=swap"
       rel="stylesheet"
     />
   </head>
@@ -16,28 +16,61 @@
         <h1>La Quête du Trésor de Kaamelot</h1>
       </header>
 
+      <div id="instructions" class="instructions">
+        <h2>Instructions</h2>
+        <p>
+          Bienvenue, brave chevalier ! Votre quête se déroule en deux étapes :
+        </p>
+        <ol>
+          <li>
+            Trouvez le chemin le plus court vers l'entrée du labyrinthe sur la
+            carte du royaume.
+          </li>
+          <li>Naviguez dans le labyrinthe pour découvrir le trésor caché.</li>
+        </ol>
+      </div>
+
       <main>
         <section id="kingdom-section">
+          <h2>Carte du Royaume</h2>
           <canvas id="kingdomCanvas"></canvas>
           <div class="controls">
-            <label for="start-point">Départ:</label>
-            <select id="start-point"></select>
-            <label for="end-point">Arrivée:</label>
-            <select id="end-point"></select>
-            <button id="find-path">Trouver le chemin</button>
+            <label for="start-point" title="Choisissez votre point de départ"
+              >Départ:</label
+            >
+            <select
+              id="start-point"
+              title="Sélectionnez le lieu de départ"
+            ></select>
+            <label for="end-point" title="Choisissez votre destination"
+              >Arrivée:</label
+            >
+            <select id="end-point" title="Sélectionnez la destination"></select>
+            <button
+              id="find-path"
+              title="Cliquez pour trouver le chemin le plus court"
+            >
+              Trouver le chemin
+            </button>
           </div>
         </section>
 
         <section id="maze-section">
+          <h2>Le Labyrinthe Mystérieux</h2>
           <canvas id="mazeCanvas"></canvas>
           <div class="controls">
-            <button id="find-treasure">Trouver le trésor</button>
+            <button
+              id="find-treasure"
+              title="Cliquez pour trouver le chemin vers le trésor"
+            >
+              Trouver le trésor
+            </button>
           </div>
         </section>
       </main>
 
       <footer>
-        <p>&copy; 2023 Royaume de Kaamelot. Tous droits réservés.</p>
+        <p>&copy; 2024 Royaume de Kaamelot. Tous droits réservés.</p>
       </footer>
     </div>
 
