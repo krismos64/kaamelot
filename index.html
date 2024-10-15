@@ -4,19 +4,39 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Royaume de Kaamelot et Labyrinthe</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>Royaume de Kaamelot et Labyrinthe</h1>
-    <div class="canvas-container">
-      <canvas id="kingdomCanvas" width="600" height="400"></canvas>
-      <canvas id="mazeCanvas" width="400" height="400"></canvas>
-    </div>
-    <div id="instructions">
-      <p>
-        Utilisez les flèches du clavier pour déplacer Arthur dans le labyrinthe.
-      </p>
-    </div>
+    <header>
+      <h1>Royaume de Kaamelot et Labyrinthe</h1>
+    </header>
+
+    <main>
+      <section id="kingdom-section">
+        <h2>Carte du Royaume</h2>
+        <canvas id="kingdomCanvas"></canvas>
+        <div class="controls">
+          <label for="start-point">Départ:</label>
+          <select id="start-point"></select>
+          <label for="end-point">Arrivée:</label>
+          <select id="end-point"></select>
+          <button id="find-path">Trouver le chemin</button>
+        </div>
+      </section>
+
+      <section id="maze-section">
+        <h2>Labyrinthe</h2>
+        <canvas id="mazeCanvas"></canvas>
+        <div class="controls">
+          <button id="find-treasure">Trouver le trésor</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2023 Royaume de Kaamelot. Tous droits réservés.</p>
+    </footer>
+
     <script src="script.js"></script>
   </body>
 </html>
