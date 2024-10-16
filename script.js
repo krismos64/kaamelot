@@ -2,31 +2,40 @@
 const kingdom = {
   nodes: [
     "Kaamelot",
-    "Entrée du labyrinthe",
-    "Village1",
+    "Labyrinthe",
+    "KingVillage",
+    "QueenVillage",
     "Forêt",
     "Montagne",
     "Lac",
+    "Port",
   ],
   edges: [
-    { from: "Kaamelot", to: "Village1", weight: 5 },
-    { from: "Kaamelot", to: "Forêt", weight: 8 },
-    { from: "Village1", to: "Forêt", weight: 3 },
-    { from: "Village1", to: "Montagne", weight: 7 },
-    { from: "Forêt", to: "Lac", weight: 4 },
-    { from: "Montagne", to: "Lac", weight: 6 },
-    { from: "Lac", to: "Entrée du labyrinthe", weight: 5 },
+    { from: "Kaamelot", to: "KingVillage", weight: 3 },
+    { from: "Kaamelot", to: "Montagne", weight: 7 },
+    { from: "Kaamelot", to: "QueenVillage", weight: 4 },
+    { from: "Kaamelot", to: "Forêt", weight: 5 },
+    { from: "KingVillage", to: "Forêt", weight: 7 },
+    { from: "KingVillage", to: "Montagne", weight: 8 },
+    { from: "Forêt", to: "Lac", weight: 9 },
+    { from: "Montagne", to: "Lac", weight: 5 },
+    { from: "Lac", to: "Labyrinthe", weight: 12 },
+    { from: "QueenVillage", to: "KingVillage", weight: 3 },
+    { from: "QueenVillage", to: "Port", weight: 6 },
+    { from: "Port", to: "Forêt", weight: 6 },
   ],
 };
 
 // Coordonnées des points de passage sur l'image
 const locations = {
-  Kaamelot: { x: 150, y: 100 },
-  "Entrée du labyrinthe": { x: 450, y: 350 },
-  Village1: { x: 300, y: 200 },
-  Forêt: { x: 200, y: 300 },
-  Montagne: { x: 400, y: 150 },
-  Lac: { x: 350, y: 250 },
+  Kaamelot: { x: 180, y: 150 },
+  Labyrinthe: { x: 65, y: 310 },
+  KingVillage: { x: 300, y: 165 },
+  QueenVillage: { x: 360, y: 230 },
+  Forêt: { x: 170, y: 280 },
+  Montagne: { x: 150, y: 30 },
+  Lac: { x: 50, y: 50 },
+  Port: { x: 300, y: 340 },
 };
 
 // Constantes pour le labyrinthe
