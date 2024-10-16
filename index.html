@@ -33,18 +33,31 @@
       <main>
         <section id="kingdom-section">
           <h2>Carte du Royaume</h2>
-          <canvas id="kingdomCanvas"></canvas>
+          <div class="map-container" style="position: relative">
+            <img
+              id="kingdomMap"
+              src="img/kingdom_map.jpg"
+              alt="Carte du Royaume de Kaamelot"
+              style="display: block; width: 100%; height: auto"
+            />
+            <canvas
+              id="kingdomCanvas"
+              style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+              "
+            ></canvas>
+          </div>
           <div class="controls">
-            <label for="start-point" title="Choisissez votre point de départ"
-              >Départ:</label
-            >
+            <label for="start-point">Départ:</label>
             <select
               id="start-point"
               title="Sélectionnez le lieu de départ"
             ></select>
-            <label for="end-point" title="Choisissez votre destination"
-              >Arrivée:</label
-            >
+            <label for="end-point">Arrivée:</label>
             <select id="end-point" title="Sélectionnez la destination"></select>
             <button
               id="find-path"

@@ -19,6 +19,16 @@ const kingdom = {
   ],
 };
 
+// Coordonnées des points de passage sur l'image
+const locations = {
+  Kaamelot: { x: 150, y: 100 },
+  "Entrée du labyrinthe": { x: 450, y: 350 },
+  Village1: { x: 300, y: 200 },
+  Forêt: { x: 200, y: 300 },
+  Montagne: { x: 400, y: 150 },
+  Lac: { x: 350, y: 250 },
+};
+
 // Constantes pour le labyrinthe
 const MAZE_SIZE = 15;
 const CELL_SIZE = 30;
@@ -32,43 +42,45 @@ let treasurePosition = { x: MAZE_SIZE - 1, y: MAZE_SIZE - 1 };
 function drawKingdom() {
   const canvas = document.getElementById("kingdomCanvas");
   const ctx = canvas.getContext("2d");
+  const img = document.getElementById("kingdomMap");
 
-  canvas.width = 600;
-  canvas.height = 400;
+  // Ajuster la taille du canvas à celle de l'image
+  canvas.width = img.width;
+  canvas.height = img.height;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Dessiner les nœuds
-  kingdom.nodes.forEach((node, index) => {
-    const x = 100 + (index % 3) * 200;
-    const y = 100 + Math.floor(index / 3) * 200;
+  // Dessiner les points de passage
+  for (let [name, pos] of Object.entries(locations)) {
     ctx.beginPath();
-    ctx.arc(x, y, 30, 0, 2 * Math.PI);
-    ctx.fillStyle = "lightblue";
+    ctx.arc(pos.x, pos.y, 10, 0, 2 * Math.PI);
+    ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
     ctx.fill();
     ctx.stroke();
-    ctx.fillStyle = "black";
-    ctx.font = "14px Merriweather";
-    ctx.textAlign = "center";
-    ctx.fillText(node, x, y + 45);
-  });
 
-  // Dessiner les arêtes
-  kingdom.edges.forEach((edge) => {
-    const fromIndex = kingdom.nodes.indexOf(edge.from);
-    const toIndex = kingdom.nodes.indexOf(edge.to);
-    const fromX = 100 + (fromIndex % 3) * 200;
-    const fromY = 100 + Math.floor(fromIndex / 3) * 200;
-    const toX = 100 + (toIndex % 3) * 200;
-    const toY = 100 + Math.floor(toIndex / 3) * 200;
-
-    ctx.beginPath();
-    ctx.moveTo(fromX, fromY);
-    ctx.lineTo(toX, toY);
-    ctx.stroke();
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "white";
     ctx.font = "12px Merriweather";
-    ctx.fillText(edge.weight.toString(), (fromX + toX) / 2, (fromY + toY) / 2);
+    ctx.textAlign = "center";
+    ctx.fillText(name, pos.x, pos.y - 15);
+  }
+
+  // Dessiner les chemins
+  kingdom.edges.forEach((edge) => {
+    const from = locations[edge.from];
+    const to = locations[edge.to];
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.stroke();
+
+    // Afficher le poids du chemin
+    const midX = (from.x + to.x) / 2;
+    const midY = (from.y + to.y) / 2;
+    ctx.fillStyle = "white";
+    ctx.fillRect(midX - 10, midY - 10, 20, 20);
+    ctx.fillStyle = "black";
+    ctx.fillText(edge.weight.toString(), midX, midY + 5);
   });
 }
 
@@ -119,22 +131,14 @@ function drawShortestPath(path) {
   const canvas = document.getElementById("kingdomCanvas");
   const ctx = canvas.getContext("2d");
 
-  for (let i = 0; i < path.length - 1; i++) {
-    const fromIndex = kingdom.nodes.indexOf(path[i]);
-    const toIndex = kingdom.nodes.indexOf(path[i + 1]);
-    const fromX = 100 + (fromIndex % 3) * 200;
-    const fromY = 100 + Math.floor(fromIndex / 3) * 200;
-    const toX = 100 + (toIndex % 3) * 200;
-    const toY = 100 + Math.floor(toIndex / 3) * 200;
-
-    ctx.beginPath();
-    ctx.moveTo(fromX, fromY);
-    ctx.lineTo(toX, toY);
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 3;
-    ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(locations[path[0]].x, locations[path[0]].y);
+  for (let i = 1; i < path.length; i++) {
+    ctx.lineTo(locations[path[i]].x, locations[path[i]].y);
   }
-  ctx.strokeStyle = "black";
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 3;
+  ctx.stroke();
   ctx.lineWidth = 1;
 }
 
@@ -287,7 +291,15 @@ function showHelpMessage(message) {
 
 // Initialisation
 window.onload = () => {
-  drawKingdom();
+  const canvas = document.getElementById("kingdomCanvas");
+  const img = document.getElementById("kingdomMap");
+
+  img.onload = () => {
+    canvas.width = img.width;
+    canvas.height = img.height;
+    drawKingdom();
+  };
+
   generateMaze();
   drawMaze();
 
@@ -326,6 +338,20 @@ window.onload = () => {
       showHelpMessage("Le trésor a été trouvé ! Suivez le chemin rouge.");
     } else {
       alert("Impossible de trouver un chemin vers le trésor !");
+    }
+  });
+
+  // Ajout d'interactivité à la carte
+  canvas.addEventListener("click", (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    for (let [name, pos] of Object.entries(locations)) {
+      if (Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2) < 15) {
+        showHelpMessage(`Vous avez cliqué sur ${name}`);
+        break;
+      }
     }
   });
 };

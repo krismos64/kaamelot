@@ -173,4 +173,24 @@ button:hover {
   button {
     width: 100%;
   }
+
+  .map-container {
+    position: relative;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  #kingdomMap {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  #kingdomCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 }
