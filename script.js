@@ -15,11 +15,17 @@ const kingdom = {
     { from: "Kaamelot", to: "Montagne", weight: 7 },
     { from: "Kaamelot", to: "QueenVillage", weight: 4 },
     { from: "Kaamelot", to: "Forêt", weight: 5 },
+    { from: "Kaamelot", to: "Port", weight: 12 },
+    { from: "Kaamelot", to: "Lac", weight: 13 },
+    { from: "Kaamelot", to: "Labyrinthe", weight: 26 },
+    { from: "KingVillage", to: "QueenVillage", weight: 6 },
     { from: "KingVillage", to: "Forêt", weight: 7 },
     { from: "KingVillage", to: "Montagne", weight: 8 },
     { from: "Forêt", to: "Lac", weight: 9 },
     { from: "Montagne", to: "Lac", weight: 5 },
+    { from: "Montagne", to: "Labyrinthe", weight: 18 },
     { from: "Lac", to: "Labyrinthe", weight: 12 },
+    { from: "Lac", to: "Forêt", weight: 20 },
     { from: "QueenVillage", to: "KingVillage", weight: 3 },
     { from: "QueenVillage", to: "Port", weight: 6 },
     { from: "Port", to: "Forêt", weight: 6 },
@@ -46,6 +52,26 @@ const CELL_SIZE = 30;
 let maze = [];
 let startPosition = { x: 0, y: 0 };
 let treasurePosition = { x: MAZE_SIZE - 1, y: MAZE_SIZE - 1 };
+
+// Classe PriorityQueue pour optimiser Dijkstra
+class PriorityQueue {
+  constructor() {
+    this.elements = [];
+  }
+
+  enqueue(element, priority) {
+    this.elements.push({ element, priority });
+    this.elements.sort((a, b) => a.priority - b.priority);
+  }
+
+  dequeue() {
+    return this.elements.shift();
+  }
+
+  isEmpty() {
+    return this.elements.length === 0;
+  }
+}
 
 // Fonction pour dessiner le royaume
 function drawKingdom() {
@@ -97,19 +123,16 @@ function drawKingdom() {
 function dijkstra(start, end) {
   const distances = {};
   const previous = {};
-  const nodes = new Set(kingdom.nodes);
+  const queue = new PriorityQueue();
 
   kingdom.nodes.forEach((node) => {
-    distances[node] = Infinity;
+    distances[node] = node === start ? 0 : Infinity;
     previous[node] = null;
+    queue.enqueue(node, distances[node]);
   });
-  distances[start] = 0;
 
-  while (nodes.size > 0) {
-    const closest = Array.from(nodes).reduce((a, b) =>
-      distances[a] < distances[b] ? a : b
-    );
-    nodes.delete(closest);
+  while (!queue.isEmpty()) {
+    const closest = queue.dequeue().element;
 
     if (closest === end) break;
 
@@ -121,6 +144,7 @@ function dijkstra(start, end) {
         if (alt < distances[neighbor]) {
           distances[neighbor] = alt;
           previous[neighbor] = closest;
+          queue.enqueue(neighbor, alt);
         }
       });
   }
@@ -133,6 +157,20 @@ function dijkstra(start, end) {
   }
 
   return path;
+}
+
+// Fonction pour calculer la distance totale d'un chemin
+function calculatePathDistance(path) {
+  let distance = 0;
+  for (let i = 0; i < path.length - 1; i++) {
+    const edge = kingdom.edges.find(
+      (e) =>
+        (e.from === path[i] && e.to === path[i + 1]) ||
+        (e.to === path[i] && e.from === path[i + 1])
+    );
+    distance += edge.weight;
+  }
+  return distance;
 }
 
 // Fonction pour dessiner le chemin le plus court
@@ -331,10 +369,11 @@ window.onload = () => {
       return;
     }
     const path = dijkstra(start, end);
+    const distance = calculatePathDistance(path);
     drawKingdom();
     drawShortestPath(path);
     showHelpMessage(
-      "Voici le chemin le plus court vers l'entrée du labyrinthe !"
+      `Chemin le plus court trouvé ! Distance totale : ${distance}`
     );
   });
 
