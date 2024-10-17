@@ -1,9 +1,8 @@
 🏰 La Quête du Trésor de Kaamelott
 
-Un jeu d'aventure interactif basé sur la légende arthurienne et l'univers de Kaamelott
-
 📜 Description
-Dans "La Quête du Trésor de Kaamelott", les joueurs incarnent les chevaliers de la Table Ronde, aidant le roi Arthur à trouver un trésor légendaire caché dans un labyrinthe mystérieux. Le jeu combine stratégie, exploration et résolution de problèmes dans un univers médiéval fantastique.
+Dans "La Quête du Trésor de Kaamelott", les visiteurs incarnent les chevaliers de la Table Ronde, aidant le roi Arthur à trouver un trésor légendaire caché dans un labyrinthe mystérieux. Le jeu combine stratégie, exploration et résolution de problèmes dans un univers médiéval fantastique.
+
 🌟 Fonctionnalités
 
 Carte interactive du royaume : Explorez Kaamelott et ses environs
