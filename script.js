@@ -84,23 +84,6 @@ function drawKingdom() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Dessiner les points de passage
-  for (let [name, pos] of Object.entries(locations)) {
-    const x = (pos.x / 100) * canvas.width;
-    const y = (pos.y / 100) * canvas.height;
-
-    ctx.beginPath();
-    ctx.arc(x, y, canvas.width * 0.025, 0, 2 * Math.PI);
-    ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = "white";
-    ctx.font = `${canvas.width * 0.03}px Merriweather`;
-    ctx.textAlign = "center";
-    ctx.fillText(name, x, y - canvas.height * 0.0375);
-  }
-
   // Dessiner les chemins
   kingdom.edges.forEach((edge) => {
     const from = locations[edge.from];
@@ -114,6 +97,7 @@ function drawKingdom() {
     ctx.moveTo(fromX, fromY);
     ctx.lineTo(toX, toY);
     ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.lineWidth = 2;
     ctx.stroke();
 
     // Afficher le poids du chemin
@@ -121,15 +105,37 @@ function drawKingdom() {
     const midY = (fromY + toY) / 2;
     ctx.fillStyle = "white";
     ctx.fillRect(
-      midX - canvas.width * 0.025,
-      midY - canvas.height * 0.025,
-      canvas.width * 0.05,
-      canvas.height * 0.05
+      midX - canvas.width * 0.02,
+      midY - canvas.height * 0.015,
+      canvas.width * 0.04,
+      canvas.height * 0.03
     );
     ctx.fillStyle = "black";
-    ctx.font = `${canvas.width * 0.03}px Merriweather`;
-    ctx.fillText(edge.weight.toString(), midX, midY + canvas.height * 0.0125);
+    ctx.font = `${canvas.width * 0.02}px Merriweather`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(edge.weight.toString(), midX, midY);
   });
+
+  // Dessiner les points de passage
+  for (let [name, pos] of Object.entries(locations)) {
+    const x = (pos.x / 100) * canvas.width;
+    const y = (pos.y / 100) * canvas.height;
+
+    ctx.beginPath();
+    ctx.arc(x, y, canvas.width * 0.015, 0, 2 * Math.PI);
+    ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
+    ctx.fill();
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = "black";
+    ctx.font = `${canvas.width * 0.02}px Merriweather`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillText(name, x, y - canvas.height * 0.01);
+  }
 }
 // Algorithme de Dijkstra pour trouver le plus court chemin
 function dijkstra(start, end) {
@@ -187,6 +193,8 @@ function calculatePathDistance(path) {
 
 // Fonction pour dessiner le chemin le plus court
 function drawShortestPath(path) {
+  drawKingdom(); // Redessiner la carte pour effacer l'ancien chemin
+
   const canvas = document.getElementById("kingdomCanvas");
   const ctx = canvas.getContext("2d");
 
@@ -200,9 +208,8 @@ function drawShortestPath(path) {
   }
 
   ctx.strokeStyle = "red";
-  ctx.lineWidth = canvas.width * 0.0075;
+  ctx.lineWidth = canvas.width * 0.005;
   ctx.stroke();
-  ctx.lineWidth = 1;
 }
 
 // Fonction pour générer un labyrinthe simple avec un chemin garanti
