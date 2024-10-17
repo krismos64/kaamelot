@@ -34,14 +34,14 @@ const kingdom = {
 
 // Coordonnées des points de passage sur l'image
 const locations = {
-  Kaamelot: { x: 180, y: 150 },
-  Labyrinthe: { x: 65, y: 310 },
-  KingVillage: { x: 300, y: 165 },
-  QueenVillage: { x: 360, y: 230 },
-  Forêt: { x: 170, y: 280 },
-  Montagne: { x: 150, y: 30 },
-  Lac: { x: 50, y: 50 },
-  Port: { x: 300, y: 340 },
+  Kaamelot: { x: 45, y: 37.5 }, // 180/400 * 100, 150/400 * 100
+  Labyrinthe: { x: 16.25, y: 77.5 }, // 65/400 * 100, 310/400 * 100
+  KingVillage: { x: 75, y: 41.25 },
+  QueenVillage: { x: 90, y: 57.5 },
+  Forêt: { x: 42.5, y: 70 },
+  Montagne: { x: 37.5, y: 7.5 },
+  Lac: { x: 12.5, y: 12.5 },
+  Port: { x: 75, y: 85 },
 };
 
 // Constantes pour le labyrinthe
@@ -79,7 +79,6 @@ function drawKingdom() {
   const ctx = canvas.getContext("2d");
   const img = document.getElementById("kingdomMap");
 
-  // Ajuster la taille du canvas à celle de l'image
   canvas.width = img.width;
   canvas.height = img.height;
 
@@ -87,38 +86,51 @@ function drawKingdom() {
 
   // Dessiner les points de passage
   for (let [name, pos] of Object.entries(locations)) {
+    const x = (pos.x / 100) * canvas.width;
+    const y = (pos.y / 100) * canvas.height;
+
     ctx.beginPath();
-    ctx.arc(pos.x, pos.y, 10, 0, 2 * Math.PI);
+    ctx.arc(x, y, canvas.width * 0.025, 0, 2 * Math.PI);
     ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
     ctx.fill();
     ctx.stroke();
 
     ctx.fillStyle = "white";
-    ctx.font = "12px Merriweather";
+    ctx.font = `${canvas.width * 0.03}px Merriweather`;
     ctx.textAlign = "center";
-    ctx.fillText(name, pos.x, pos.y - 15);
+    ctx.fillText(name, x, y - canvas.height * 0.0375);
   }
 
   // Dessiner les chemins
   kingdom.edges.forEach((edge) => {
     const from = locations[edge.from];
     const to = locations[edge.to];
+    const fromX = (from.x / 100) * canvas.width;
+    const fromY = (from.y / 100) * canvas.height;
+    const toX = (to.x / 100) * canvas.width;
+    const toY = (to.y / 100) * canvas.height;
+
     ctx.beginPath();
-    ctx.moveTo(from.x, from.y);
-    ctx.lineTo(to.x, to.y);
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
     ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
     ctx.stroke();
 
     // Afficher le poids du chemin
-    const midX = (from.x + to.x) / 2;
-    const midY = (from.y + to.y) / 2;
+    const midX = (fromX + toX) / 2;
+    const midY = (fromY + toY) / 2;
     ctx.fillStyle = "white";
-    ctx.fillRect(midX - 10, midY - 10, 20, 20);
+    ctx.fillRect(
+      midX - canvas.width * 0.025,
+      midY - canvas.height * 0.025,
+      canvas.width * 0.05,
+      canvas.height * 0.05
+    );
     ctx.fillStyle = "black";
-    ctx.fillText(edge.weight.toString(), midX, midY + 5);
+    ctx.font = `${canvas.width * 0.03}px Merriweather`;
+    ctx.fillText(edge.weight.toString(), midX, midY + canvas.height * 0.0125);
   });
 }
-
 // Algorithme de Dijkstra pour trouver le plus court chemin
 function dijkstra(start, end) {
   const distances = {};
@@ -179,12 +191,16 @@ function drawShortestPath(path) {
   const ctx = canvas.getContext("2d");
 
   ctx.beginPath();
-  ctx.moveTo(locations[path[0]].x, locations[path[0]].y);
+  const start = locations[path[0]];
+  ctx.moveTo((start.x / 100) * canvas.width, (start.y / 100) * canvas.height);
+
   for (let i = 1; i < path.length; i++) {
-    ctx.lineTo(locations[path[i]].x, locations[path[i]].y);
+    const point = locations[path[i]];
+    ctx.lineTo((point.x / 100) * canvas.width, (point.y / 100) * canvas.height);
   }
+
   ctx.strokeStyle = "red";
-  ctx.lineWidth = 3;
+  ctx.lineWidth = canvas.width * 0.0075;
   ctx.stroke();
   ctx.lineWidth = 1;
 }
@@ -401,5 +417,14 @@ window.onload = () => {
         break;
       }
     }
+  });
+
+  window.addEventListener("resize", () => {
+    const img = document.getElementById("kingdomMap");
+    img.onload = () => {
+      drawKingdom();
+      // Redessiner le chemin si nécessaire
+    };
+    img.src = img.src; // Recharge l'image pour déclencher l'événement onload
   });
 };
