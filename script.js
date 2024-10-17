@@ -45,13 +45,13 @@ const locations = {
 };
 
 // Constantes pour le labyrinthe
-const MAZE_SIZE = 15;
-const CELL_SIZE = 30;
+const MAZE_SIZE = 25;
+const CELL_SIZE = 25;
 
 // Variables globales
 let maze = [];
 let startPosition = { x: 0, y: 0 };
-let treasurePosition = { x: MAZE_SIZE - 1, y: MAZE_SIZE - 1 };
+let treasurePosition = { x: MAZE_SIZE - 5, y: MAZE_SIZE - 7 };
 
 // Classe PriorityQueue pour optimiser Dijkstra
 class PriorityQueue {
@@ -130,13 +130,28 @@ function drawKingdom() {
     ctx.lineWidth = 1;
     ctx.stroke();
 
+    // Nouveau code pour améliorer la lisibilité des noms
+    ctx.font = `bold ${canvas.width * 0.02}px Merriweather`;
+    const textWidth = ctx.measureText(name).width;
+    const padding = canvas.width * 0.005;
+
+    // Dessiner le fond blanc
+    ctx.fillStyle = "white";
+    ctx.fillRect(
+      x - textWidth / 2 - padding,
+      y - canvas.height * 0.04 - padding,
+      textWidth + padding * 2,
+      canvas.height * 0.03 + padding * 2
+    );
+
+    // Dessiner le texte en noir et en gras
     ctx.fillStyle = "black";
-    ctx.font = `${canvas.width * 0.02}px Merriweather`;
     ctx.textAlign = "center";
     ctx.textBaseline = "bottom";
     ctx.fillText(name, x, y - canvas.height * 0.01);
   }
 }
+
 // Algorithme de Dijkstra pour trouver le plus court chemin
 function dijkstra(start, end) {
   const distances = {};
