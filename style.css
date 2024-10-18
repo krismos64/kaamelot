@@ -81,15 +81,53 @@ canvas {
   margin: 0 auto;
   border: 2px solid #8b4513;
 }
+#maze-section {
+  background-image: url("old_paper_texture.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
 
+#mazeCanvas {
+  display: block;
+  margin: 0 auto;
+  border: 3px solid #8b4513;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 .controls {
   margin-top: 20px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
   justify-content: center;
+  gap: 10px;
 }
 
+#find-treasure {
+  background-color: #daa520;
+  color: #2c1d0a;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#find-treasure:hover {
+  background-color: #b8860b;
+}
+
+.help-message {
+  background-color: rgba(139, 69, 19, 0.9);
+  color: #f5e6d3;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
 label {
   font-weight: bold;
 }

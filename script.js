@@ -52,6 +52,8 @@ const CELL_SIZE = 25;
 let maze = [];
 let startPosition = { x: 0, y: 0 };
 let treasurePosition = { x: MAZE_SIZE - 5, y: MAZE_SIZE - 7 };
+let playerPosition = { ...startPosition };
+let pathFound = false;
 
 // Classe PriorityQueue pour optimiser Dijkstra
 class PriorityQueue {
@@ -272,35 +274,53 @@ function drawMaze() {
   for (let y = 0; y < MAZE_SIZE; y++) {
     for (let x = 0; x < MAZE_SIZE; x++) {
       if (maze[y][x] === 1) {
-        ctx.fillStyle = "black";
+        ctx.fillStyle = "#8B4513"; // Couleur marron pour les murs
         ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      } else {
+        // Ajout d'une texture pour le sol
+        ctx.fillStyle = "#D2B48C"; // Couleur beige clair pour le sol
+        ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        ctx.strokeStyle = "#C19A6B"; // Couleur légèrement plus foncée pour les lignes
+        ctx.strokeRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
       }
     }
   }
 
   // Dessiner le point de départ
-  ctx.fillStyle = "green";
+  drawCell(startPosition, "green", "Départ");
+
+  // Dessiner le trésor
+  drawCell(treasurePosition, "gold", "Trésor");
+
+  // Dessiner le joueur
+  drawCell(playerPosition, "blue", "Joueur");
+}
+
+// Fonction pour dessiner une cellule spéciale (départ, trésor, joueur)
+function drawCell(position, color, label) {
+  const canvas = document.getElementById("mazeCanvas");
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = color;
   ctx.beginPath();
   ctx.arc(
-    (startPosition.x + 0.5) * CELL_SIZE,
-    (startPosition.y + 0.5) * CELL_SIZE,
+    (position.x + 0.5) * CELL_SIZE,
+    (position.y + 0.5) * CELL_SIZE,
     CELL_SIZE / 3,
     0,
     2 * Math.PI
   );
   ctx.fill();
 
-  // Dessiner le trésor
-  ctx.fillStyle = "gold";
-  ctx.beginPath();
-  ctx.arc(
-    (treasurePosition.x + 0.5) * CELL_SIZE,
-    (treasurePosition.y + 0.5) * CELL_SIZE,
-    CELL_SIZE / 3,
-    0,
-    2 * Math.PI
+  // Ajouter une étiquette
+  ctx.fillStyle = "black";
+  ctx.font = "10px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(
+    label,
+    (position.x + 0.5) * CELL_SIZE,
+    (position.y + 0.3) * CELL_SIZE
   );
-  ctx.fill();
 }
 
 // Fonction pour trouver le chemin dans le labyrinthe
@@ -353,27 +373,80 @@ function drawMazePathSegment(path, index) {
     const current = path[index];
     const next = path[index + 1];
 
-    ctx.strokeStyle = "red";
+    ctx.strokeStyle = "rgba(255, 0, 0, 0.5)"; // Rouge semi-transparent
     ctx.lineWidth = CELL_SIZE / 3;
     ctx.beginPath();
     ctx.moveTo((current.x + 0.5) * CELL_SIZE, (current.y + 0.5) * CELL_SIZE);
     ctx.lineTo((next.x + 0.5) * CELL_SIZE, (next.y + 0.5) * CELL_SIZE);
     ctx.stroke();
 
+    // Ajouter un effet de particules
+    drawParticles(current, next);
+
     setTimeout(() => drawMazePathSegment(path, index + 1), 100);
+  } else {
+    pathFound = true;
   }
 }
 
-function showHelpMessage(message) {
-  const helpDiv = document.createElement("div");
-  helpDiv.className = "help-message";
-  helpDiv.textContent = message;
-  document.body.appendChild(helpDiv);
-  setTimeout(() => {
-    helpDiv.remove();
-  }, 3000);
+// Fonction pour dessiner des particules entre deux points
+function drawParticles(start, end) {
+  const canvas = document.getElementById("mazeCanvas");
+  const ctx = canvas.getContext("2d");
+
+  const particleCount = 5;
+  for (let i = 0; i < particleCount; i++) {
+    const t = i / (particleCount - 1);
+    const x = start.x + t * (end.x - start.x);
+    const y = start.y + t * (end.y - start.y);
+
+    ctx.fillStyle = "yellow";
+    ctx.beginPath();
+    ctx.arc((x + 0.5) * CELL_SIZE, (y + 0.5) * CELL_SIZE, 2, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+}
+// Fonction pour déplacer le joueur
+function movePlayer(dx, dy) {
+  const newX = playerPosition.x + dx;
+  const newY = playerPosition.y + dy;
+
+  if (
+    newX >= 0 &&
+    newX < MAZE_SIZE &&
+    newY >= 0 &&
+    newY < MAZE_SIZE &&
+    maze[newY][newX] === 0
+  ) {
+    playerPosition.x = newX;
+    playerPosition.y = newY;
+    drawMaze();
+
+    if (newX === treasurePosition.x && newY === treasurePosition.y) {
+      showHelpMessage("Félicitations ! Vous avez trouvé le trésor !");
+    }
+  }
 }
 
+// Gestionnaire d'événements pour les touches du clavier
+document.addEventListener("keydown", (event) => {
+  if (pathFound) return; // Désactiver le contrôle du joueur si le chemin a été trouvé
+
+  switch (event.key) {
+    case "ArrowUp":
+      movePlayer(0, -1);
+      break;
+    case "ArrowDown":
+      movePlayer(0, 1);
+      break;
+    case "ArrowLeft":
+      movePlayer(-1, 0);
+      break;
+    case "ArrowRight":
+      movePlayer(1, 0);
+      break;
+  }
+});
 // Initialisation
 window.onload = () => {
   const canvas = document.getElementById("kingdomCanvas");
@@ -417,13 +490,21 @@ window.onload = () => {
 
   // Gestionnaire pour le bouton "Trouver le trésor" du labyrinthe
   document.getElementById("find-treasure").addEventListener("click", () => {
-    const path = findMazePath();
-    if (path) {
-      drawMaze(); // Redessiner le labyrinthe pour effacer l'ancien chemin
-      drawMazePathSegment(path, 0);
-      showHelpMessage("Le trésor a été trouvé ! Suivez le chemin rouge.");
+    if (pathFound) {
+      // Réinitialiser le labyrinthe si le chemin a déjà été trouvé
+      generateMaze();
+      drawMaze();
+      pathFound = false;
+      playerPosition = { ...startPosition };
     } else {
-      alert("Impossible de trouver un chemin vers le trésor !");
+      const path = findMazePath();
+      if (path) {
+        drawMaze(); // Redessiner le labyrinthe pour effacer l'ancien chemin
+        drawMazePathSegment(path, 0);
+        showHelpMessage("Le trésor a été trouvé ! Suivez le chemin rouge.");
+      } else {
+        alert("Impossible de trouver un chemin vers le trésor !");
+      }
     }
   });
 
